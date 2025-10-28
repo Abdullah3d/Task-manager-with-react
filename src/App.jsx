@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 
 function App() {
   const [user, setUser] = useState(null);
+  const [selectedBoard, setSelectedBoard] = useState(null); // selected board
 
   // Check localStorage when app mounts
   useEffect(() => {
@@ -44,8 +45,8 @@ function App() {
               <>
                 <Header onLogout={() => setUser(null)} />
                 <div className="content flex">
-                  <Sidebar />
-                  <Main />
+                  <Sidebar onSelectBoard={setSelectedBoard} /> {/* pass callback */}
+                  <Main board={selectedBoard} /> {/* pass selected board */}
                 </div>
               </>
             ) : (

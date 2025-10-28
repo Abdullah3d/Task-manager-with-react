@@ -26,7 +26,7 @@ export default function Header({ onLogout }) {
 
             {/* Right Section */}
             <div className="flex items-center space-x-3 text-white">
-                <span className="font-medium">Remote Dev</span>
+                <span className="font-medium">Trello Task Manager</span>
 
                 {user && (
                     <div className="flex items-center space-x-2">

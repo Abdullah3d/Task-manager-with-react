@@ -4,52 +4,37 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import AddCard from "./AddCard";
 import AddMultipleCardsModal from "./AddMultipleCard";
 
-export default function Main() {
+export default function Main({ board }) {
     const [columns, setColumns] = useState([
         { id: "1", title: "To Do", cards: [{ title: "Project Description" }] },
         { id: "2", title: "In Progress", cards: [{ title: "Implement Feature A" }] },
         { id: "3", title: "Done", cards: [{ title: "Setup Project Repo" }] },
     ]);
 
-    const [openMenu, setOpenMenu] = useState(null); // which column menu is open
+    const [openMenu, setOpenMenu] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [activeColumnId, setActiveColumnId] = useState(null);
 
     const handleAddCard = (columnId, cardData) => {
         setColumns(prev =>
-            prev.map(col =>
-                col.id === columnId
-                    ? { ...col, cards: [...col.cards, cardData] }
-                    : col
-            )
+            prev.map(col => col.id === columnId ? { ...col, cards: [...col.cards, cardData] } : col)
         );
     };
 
     const handleDeleteCard = (columnId, cardIndex) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this card?");
-        if (!confirmDelete) return;
-
+        if (!window.confirm("Are you sure you want to delete this card?")) return;
         setColumns(prev =>
-            prev.map(col =>
-                col.id === columnId
-                    ? { ...col, cards: col.cards.filter((_, idx) => idx !== cardIndex) }
-                    : col
-            )
+            prev.map(col => col.id === columnId ? { ...col, cards: col.cards.filter((_, idx) => idx !== cardIndex) } : col)
         );
     };
 
     const handleAddColumn = (title) => {
-        const newColumn = {
-            id: Date.now().toString(),
-            title,
-            cards: [],
-        };
+        const newColumn = { id: Date.now().toString(), title, cards: [] };
         setColumns(prev => [...prev, newColumn]);
     };
 
     const handleDeleteColumn = (columnId) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this stage?");
-        if (!confirmDelete) return;
+        if (!window.confirm("Are you sure you want to delete this stage?")) return;
         setColumns(prev => prev.filter(col => col.id !== columnId));
     };
 
@@ -71,25 +56,32 @@ export default function Main() {
     const openAddMultipleCardsModal = (columnId) => {
         setActiveColumnId(columnId);
         setModalOpen(true);
-        setOpenMenu(null); // close the menu
+        setOpenMenu(null);
     };
 
+    // If no board selected, show placeholder
+    if (!board) return (
+        <div className="flex-1 flex items-center justify-center text-gray-300">
+            Please select a board
+        </div>
+    );
+
     return (
-        <div className="flex flex-col bg-gradient-to-r from-[#2a7b9b] via-[#5f996f] to-[#eddd53] min-h-[calc(100vh-3rem)] border-r border-[#B6c2cf] w-full">
+        <div className="flex flex-col bg-gradient-to-r from-[#2a7b9b] via-[#5f996f] to-[#eddd53] min-h-[calc(100vh-3rem)] w-full">
             {/* Header */}
             <div className="p-3 bg-[#1f1f1f]/70 flex justify-between items-center border-b border-[#B6c2cf] backdrop-blur-sm">
-                <h2 className="text-lg font-semibold text-white tracking-wide">My Trello Board</h2>
+                <h2 className="text-lg font-semibold text-white tracking-wide">{board.name}</h2>
                 <div className="flex items-center space-x-2">
-                    <button className="flex items-center bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 transition">
-                        <UserPlus size={16} className="mr-1" /> Share
-                    </button>
-                    <button className="bg-gray-200 text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-300 transition">
+                    {/* <button className="flex items-center bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 transition">
+                        <UserPlus size={16} className="mr-1" /> 
+                    </button> */}
+                    {/* <button className="bg-gray-200 text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-300 transition">
                         <MoreHorizontal size={16} />
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
-            {/* Drag & Drop Columns */}
+            {/* Columns */}
             <DragDropContext onDragEnd={handleDragEnd}>
                 <div className="flex flex-1 overflow-x-auto gap-4 p-4">
                     {columns.map(col => (
@@ -100,7 +92,6 @@ export default function Main() {
                                     {...provided.droppableProps}
                                     className="w-64 flex-shrink-0 bg-[#0e0e0e]/80 rounded-xl p-3 shadow-md border border-[#3a3a3a] text-gray-200 relative"
                                 >
-                                    {/* Column Header */}
                                     <div className="flex justify-between items-center mb-2">
                                         <span className="font-semibold">{col.title}</span>
                                         <div className="relative">
@@ -132,11 +123,7 @@ export default function Main() {
                                     {/* Cards */}
                                     <div className="space-y-2">
                                         {col.cards.map((card, idx) => (
-                                            <Draggable
-                                                key={`${col.id}-${idx}`}
-                                                draggableId={`${col.id}-${idx}`}
-                                                index={idx}
-                                            >
+                                            <Draggable key={`${col.id}-${idx}`} draggableId={`${col.id}-${idx}`} index={idx}>
                                                 {(provided) => (
                                                     <div
                                                         ref={provided.innerRef}

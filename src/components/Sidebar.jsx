@@ -1,23 +1,24 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus } from 'react-feather';
+import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'react-feather';
 import { Popover } from 'react-tiny-popover';
 
-export default function Sidebar() {
+export default function Sidebar({ onSelectBoard }) {
     const [collapsed, setCollapsed] = useState(false);
     const [showPop, setShowPop] = useState(false);
-    const [boards, setBoards] = useState([
-        { id: 1, name: "My Trello Board" },
-    ]);
+    const [boards, setBoards] = useState([{ id: 1, name: "My Trello Board" }]);
     const [newBoardName, setNewBoardName] = useState("");
 
     const addBoard = () => {
         if (!newBoardName.trim()) return;
-        setBoards(prev => [
-            ...prev,
-            { id: Date.now(), name: newBoardName.trim() },
-        ]);
+        const newBoard = { id: Date.now(), name: newBoardName.trim() };
+        setBoards(prev => [...prev, newBoard]);
         setNewBoardName("");
         setShowPop(false);
+    };
+
+    const deleteBoard = (id) => {
+        if (!window.confirm("Are you sure you want to delete this board?")) return;
+        setBoards(prev => prev.filter(board => board.id !== id));
     };
 
     return (
@@ -34,7 +35,7 @@ export default function Sidebar() {
                 <div>
                     {/* Workspace Header */}
                     <div className='workspace p-3 flex justify-between border-b border-b-[#B6c2cf]'>
-                        <h4>Remote Dev's Workspace</h4>
+                        <h4>Trello Workspace</h4>
                         <button onClick={() => setCollapsed(!collapsed)} className='hover:bg-green-400 rounded-sm p-1'>
                             <ChevronLeft size={18} />
                         </button>
@@ -49,7 +50,7 @@ export default function Sidebar() {
                                 isOpen={showPop}
                                 positions={['right', 'top', 'bottom', 'left']}
                                 content={
-                                    <div className='bg-white text-black p-2 rounded shadow-lg z-[9999] flex flex-col gap-2'>
+                                    <div className='bg-white text-black p-2 rounded shadow-lg flex flex-col gap-2'>
                                         <input
                                             type="text"
                                             value={newBoardName}
@@ -76,10 +77,20 @@ export default function Sidebar() {
                     {/* Render Boards Dynamically */}
                     <ul>
                         {boards.map((board) => (
-                            <li key={board.id}>
-                                <button className='px-3 py-2 w-full text-sm flex justify-start items-center hover:text-[#B6c2cf]'>
+                            <li key={board.id} className="flex justify-between items-center">
+                                <button
+                                    onClick={() => onSelectBoard(board)}
+                                    className='px-3 py-2 w-full text-sm flex justify-start items-center hover:text-[#B6c2cf]'
+                                >
                                     <span className='w-6 h-4 rounded-sm mr-2 bg-red-600'>&nbsp;</span>
                                     <span>{board.name}</span>
+                                </button>
+                                {/* Delete Board Button */}
+                                <button
+                                    onClick={() => deleteBoard(board.id)}
+                                    className='p-1 hover:bg-red-600 rounded-sm'
+                                >
+                                    <Trash2 size={14} className="text-white" />
                                 </button>
                             </li>
                         ))}

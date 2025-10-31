@@ -8,19 +8,17 @@ const Login = ({ onLogin }) => {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
-        setError(""); // Clear error on input change
+        setError("");
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validate inputs
         if (!form.email || !form.password) {
             setError("All fields are required!");
             return;
         }
 
-        // Safely get users from localStorage
         let users = [];
         try {
             users = JSON.parse(localStorage.getItem("users")) || [];
@@ -28,13 +26,11 @@ const Login = ({ onLogin }) => {
             users = [];
         }
 
-        // Find matching user
         const matchedUser = users.find(
             (u) => u?.email === form.email && u?.password === form.password
         );
 
         if (matchedUser) {
-            // Only store minimal info
             const minimalUser = {
                 email: matchedUser.email,
                 name: matchedUser.name || "",
@@ -54,41 +50,71 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-gradient-to-r from-teal-700 to-green-500">
-            <div className="bg-white p-10 rounded-lg shadow-lg w-96">
-                <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
-                    Login
+        <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300">
+            {/* Trello logo area */}
+            <div className="mb-8 text-center">
+                <h1 className="text-4xl font-bold text-blue-800 tracking-tight">
+                    Trello
+                </h1>
+                <p className="text-gray-700 mt-1">Log in to continue to your boards</p>
+            </div>
+
+            {/* Login card */}
+            <div className="bg-white w-96 rounded-2xl shadow-lg p-8">
+                <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+                    Log in
                 </h2>
-                <form onSubmit={handleSubmit}>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Enter your email"
-                        value={form.email}
-                        onChange={handleChange}
-                        className="w-full p-3 mb-4 rounded bg-gray-800 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        value={form.password}
-                        onChange={handleChange}
-                        className="w-full p-3 mb-4 rounded bg-gray-800 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            value={form.email}
+                            onChange={handleChange}
+                            className="w-full p-3 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                        />
+                    </div>
+
+                    <div>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            value={form.password}
+                            onChange={handleChange}
+                            className="w-full p-3 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                        />
+                    </div>
+
+                    {error && (
+                        <p className="text-red-500 text-sm font-medium text-center">
+                            {error}
+                        </p>
+                    )}
+
                     <button
                         type="submit"
-                        className="w-full p-3 rounded bg-teal-600 hover:bg-teal-700 text-white font-semibold transition-all"
+                        className="w-full p-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200"
                     >
-                        Login
+                        Log in
                     </button>
                 </form>
-                <p className="text-center mt-4 text-yellow-500">
-                    <Link to="/register" className="hover:underline">
-                        Register here
-                    </Link>
-                </p>
+
+                <div className="mt-5 text-center">
+                    <p className="text-gray-600 text-sm">
+                        Don't have an account?{" "}
+                        <Link to="/register" className="text-blue-600 hover:underline">
+                            Sign up here
+                        </Link>
+                    </p>
+                </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-8 text-gray-600 text-sm text-center">
+                <p>© 2025 Trello — Built with Abdullah</p>
             </div>
         </div>
     );

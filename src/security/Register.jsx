@@ -8,13 +8,17 @@ const Register = () => {
     mobile: "",
     email: "",
     password: "",
+    confirmPassword: "",
     picture: "",
   });
   const [preview, setPreview] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+    setMessage("");
   };
 
   const handleImageUpload = (e) => {
@@ -29,28 +33,60 @@ const Register = () => {
     }
   };
 
+  const validatePassword = (password) => {
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long.";
+    }
+    if (!specialCharRegex.test(password)) {
+      return "Password must contain at least one special character.";
+    }
+    return "";
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Password validation
+    const passwordError = validatePassword(form.password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
+    // Confirm password check
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    // Check existing users
     const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
     const userExists = existingUsers.find((u) => u.email === form.email);
 
     if (userExists) {
-      setMessage("❌ Email already registered!");
-    } else {
-      // save new user
-      localStorage.setItem("users", JSON.stringify([...existingUsers, form]));
-      setMessage("✅ Registered successfully! Redirecting...");
-      setTimeout(() => navigate("/login"), 1500);
+      setError("❌ Email already registered!");
+      return;
     }
+
+    // Save user
+    localStorage.setItem("users", JSON.stringify([...existingUsers, form]));
+    setMessage("✅ Registered successfully! Redirecting...");
+    setTimeout(() => navigate("/login"), 1500);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-6">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">
-          Create an Account
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0079bf] to-[#026aa7] p-6">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+        {/* Title */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-semibold text-[#026aa7] tracking-wide">
+            Trello Register
+          </h1>
+          <p className="text-gray-500 text-sm mt-2">
+            Create your account to get started
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Profile Picture */}
@@ -62,7 +98,7 @@ const Register = () => {
                 onChange={handleImageUpload}
                 className="hidden"
               />
-              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-indigo-300 hover:border-indigo-500 transition">
+              <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-[#026aa7]/20 hover:border-[#026aa7]/40 transition">
                 {preview ? (
                   <img
                     src={preview}
@@ -70,7 +106,7 @@ const Register = () => {
                     className="w-24 h-24 object-cover rounded-full"
                   />
                 ) : (
-                  <span className="text-gray-500">Upload</span>
+                  <span className="text-gray-500 text-sm">Upload</span>
                 )}
               </div>
             </label>
@@ -81,7 +117,7 @@ const Register = () => {
             name="name"
             placeholder="Full Name"
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
             required
           />
 
@@ -91,7 +127,7 @@ const Register = () => {
             type="tel"
             placeholder="Mobile Number"
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
             required
           />
 
@@ -101,7 +137,7 @@ const Register = () => {
             type="email"
             placeholder="Email Address"
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
             required
           />
 
@@ -109,33 +145,52 @@ const Register = () => {
           <input
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder="Password (min 8 chars & 1 symbol)"
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
             required
           />
 
-          {/* Button */}
+          {/* Confirm Password */}
+          <input
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirm Password"
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
+            required
+          />
+
+          {/* Error / Success Messages */}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {message && (
+            <p className="text-green-600 text-sm text-center">{message}</p>
+          )}
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition"
+            className="w-full bg-[#026aa7] text-white py-2 rounded-lg font-semibold hover:bg-[#055a8c] transition"
           >
             Register
           </button>
         </form>
 
-        <p className="text-sm text-center text-gray-700 mt-4">
+        <p className="text-sm text-center text-gray-600 mt-4">
           Already have an account?{" "}
-          <Link to="/login" className="text-indigo-600 font-medium hover:underline">
-            Login
+          <Link
+            to="/login"
+            className="text-[#026aa7] font-medium hover:underline"
+          >
+            Log in
           </Link>
         </p>
 
-        {message && (
-          <p className="text-center mt-4 font-medium text-green-600">
-            {message}
+        <div className="mt-6 border-t pt-3 text-center">
+          <p className="text-xs text-gray-400">
+            © {new Date().getFullYear()} Trello  — Built with Abdullah
           </p>
-        )}
+        </div>
       </div>
     </div>
   );

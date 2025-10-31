@@ -50,18 +50,20 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300">
-            {/* Trello logo area */}
-            <div className="mb-8 text-center">
-                <h1 className="text-4xl font-bold text-blue-800 tracking-tight">
+        <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 px-4 sm:px-6">
+            {/* Logo area */}
+            <div className="mb-8 sm:mb-10 text-center">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-800 tracking-tight">
                     Trello
                 </h1>
-                <p className="text-gray-700 mt-1">Log in to continue to your boards</p>
+                <p className="text-gray-700 mt-1 text-sm sm:text-base">
+                    Log in to continue to your boards
+                </p>
             </div>
 
             {/* Login card */}
-            <div className="bg-white w-96 rounded-2xl shadow-lg p-8">
-                <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+            <div className="bg-white w-full max-w-md sm:max-w-lg md:max-w-xl rounded-2xl shadow-lg p-6 sm:p-8">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-center text-gray-800 mb-6">
                     Log in
                 </h2>
 
@@ -73,7 +75,7 @@ const Login = ({ onLogin }) => {
                             placeholder="Enter your email"
                             value={form.email}
                             onChange={handleChange}
-                            className="w-full p-3 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                            className="w-full p-3 sm:p-4 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                         />
                     </div>
 
@@ -84,26 +86,26 @@ const Login = ({ onLogin }) => {
                             placeholder="Enter your password"
                             value={form.password}
                             onChange={handleChange}
-                            className="w-full p-3 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                            className="w-full p-3 sm:p-4 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                         />
                     </div>
 
                     {error && (
-                        <p className="text-red-500 text-sm font-medium text-center">
+                        <p className="text-red-500 text-sm sm:text-base font-medium text-center">
                             {error}
                         </p>
                     )}
 
                     <button
                         type="submit"
-                        className="w-full p-3 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200"
+                        className="w-full p-3 sm:p-4 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200"
                     >
                         Log in
                     </button>
                 </form>
 
-                <div className="mt-5 text-center">
-                    <p className="text-gray-600 text-sm">
+                <div className="mt-5 sm:mt-6 text-center">
+                    <p className="text-gray-600 text-sm sm:text-base">
                         Don't have an account?{" "}
                         <Link to="/register" className="text-blue-600 hover:underline">
                             Sign up here
@@ -113,7 +115,7 @@ const Login = ({ onLogin }) => {
             </div>
 
             {/* Footer */}
-            <div className="mt-8 text-gray-600 text-sm text-center">
+            <div className="mt-8 sm:mt-10 text-gray-600 text-sm sm:text-base text-center">
                 <p>© 2025 Trello — Built with Abdullah</p>
             </div>
         </div>

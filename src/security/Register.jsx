@@ -47,20 +47,17 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Password validation
     const passwordError = validatePassword(form.password);
     if (passwordError) {
       setError(passwordError);
       return;
     }
 
-    // Confirm password check
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    // Check existing users
     const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
     const userExists = existingUsers.find((u) => u.email === form.email);
 
@@ -69,21 +66,20 @@ const Register = () => {
       return;
     }
 
-    // Save user
     localStorage.setItem("users", JSON.stringify([...existingUsers, form]));
     setMessage("✅ Registered successfully! Redirecting...");
     setTimeout(() => navigate("/login"), 1500);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0079bf] to-[#026aa7] p-6">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0079bf] to-[#026aa7] px-4 sm:px-6">
+      <div className="bg-white w-full max-w-md sm:max-w-lg md:max-w-xl rounded-2xl shadow-lg p-6 sm:p-8">
         {/* Title */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-semibold text-[#026aa7] tracking-wide">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[#026aa7] tracking-wide">
             Trello Register
           </h1>
-          <p className="text-gray-500 text-sm mt-2">
+          <p className="text-gray-500 text-sm sm:text-base mt-2">
             Create your account to get started
           </p>
         </div>
@@ -98,97 +94,76 @@ const Register = () => {
                 onChange={handleImageUpload}
                 className="hidden"
               />
-              <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-[#026aa7]/20 hover:border-[#026aa7]/40 transition">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-[#026aa7]/20 hover:border-[#026aa7]/40 transition">
                 {preview ? (
                   <img
                     src={preview}
                     alt="Profile Preview"
-                    className="w-24 h-24 object-cover rounded-full"
+                    className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full"
                   />
                 ) : (
-                  <span className="text-gray-500 text-sm">Upload</span>
+                  <span className="text-gray-500 text-sm sm:text-base">Upload</span>
                 )}
               </div>
             </label>
           </div>
 
-          {/* Name */}
-          <input
-            name="name"
-            placeholder="Full Name"
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
-            required
-          />
-
-          {/* Mobile */}
-          <input
-            name="mobile"
-            type="tel"
-            placeholder="Mobile Number"
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
-            required
-          />
-
-          {/* Email */}
-          <input
-            name="email"
-            type="email"
-            placeholder="Email Address"
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
-            required
-          />
-
-          {/* Password */}
-          <input
-            name="password"
-            type="password"
-            placeholder="Password (min 8 chars & 1 symbol)"
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
-            required
-          />
-
-          {/* Confirm Password */}
-          <input
-            name="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
-            required
-          />
+          {/* Inputs */}
+          {["name", "mobile", "email", "password", "confirmPassword"].map((field) => (
+            <input
+              key={field}
+              name={field}
+              type={
+                field.includes("password")
+                  ? "password"
+                  : field === "email"
+                  ? "email"
+                  : field === "mobile"
+                  ? "tel"
+                  : "text"
+              }
+              placeholder={
+                field === "name"
+                  ? "Full Name"
+                  : field === "mobile"
+                  ? "Mobile Number"
+                  : field === "email"
+                  ? "Email Address"
+                  : field === "password"
+                  ? "Password (min 8 chars & 1 symbol)"
+                  : "Confirm Password"
+              }
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
+              required
+            />
+          ))}
 
           {/* Error / Success Messages */}
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          {message && (
-            <p className="text-green-600 text-sm text-center">{message}</p>
-          )}
+          {error && <p className="text-red-500 text-sm sm:text-base text-center">{error}</p>}
+          {message && <p className="text-green-600 text-sm sm:text-base text-center">{message}</p>}
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#026aa7] text-white py-2 rounded-lg font-semibold hover:bg-[#055a8c] transition"
+            className="w-full bg-[#026aa7] text-white py-2 sm:py-3 rounded-lg font-semibold hover:bg-[#055a8c] transition"
           >
             Register
           </button>
         </form>
 
-        <p className="text-sm text-center text-gray-600 mt-4">
+        {/* Login link */}
+        <p className="text-sm sm:text-base text-center text-gray-600 mt-4">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-[#026aa7] font-medium hover:underline"
-          >
+          <Link to="/login" className="text-[#026aa7] font-medium hover:underline">
             Log in
           </Link>
         </p>
 
+        {/* Footer */}
         <div className="mt-6 border-t pt-3 text-center">
-          <p className="text-xs text-gray-400">
-            © {new Date().getFullYear()} Trello  — Built with Abdullah
+          <p className="text-xs sm:text-sm text-gray-400">
+            © {new Date().getFullYear()} Trello — Built with Abdullah
           </p>
         </div>
       </div>

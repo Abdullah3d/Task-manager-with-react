@@ -108,13 +108,13 @@ export default function Main({ board }) {
                                                         className="hover:bg-[#4A4F55] p-1 rounded text-left"
                                                         onClick={() => openAddMultipleCardsModal(col.id)}
                                                     >
-                                                        ➕ Add Multiple Cards
+                                                         Add Multiple Cards
                                                     </button>
                                                     <button
                                                         className="hover:bg-[#4A4F55] p-1 rounded text-left text-red-400"
                                                         onClick={() => handleDeleteColumn(col.id)}
                                                     >
-                                                        🗑 Delete List
+                                                         Delete List
                                                     </button>
                                                 </div>
                                             )}

@@ -8,7 +8,6 @@ const Register = () => {
     mobile: "",
     email: "",
     password: "",
-    confirmPassword: "",
     picture: "",
   });
   const [preview, setPreview] = useState("");
@@ -21,18 +20,20 @@ const Register = () => {
     setMessage("");
   };
 
+  // 🖼️ Upload + Convert image to Base64
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
-        setForm({ ...form, picture: reader.result });
+        setForm((prev) => ({ ...prev, picture: reader.result }));
       };
       reader.readAsDataURL(file);
     }
   };
 
+  // 🧠 Password validation
   const validatePassword = (password) => {
     const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
     if (password.length < 8) {
@@ -53,21 +54,10 @@ const Register = () => {
       return;
     }
 
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+    // ✅ Save single user data (for header access)
+    localStorage.setItem("user", JSON.stringify(form));
 
-    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-    const userExists = existingUsers.find((u) => u.email === form.email);
-
-    if (userExists) {
-      setError("❌ Email already registered!");
-      return;
-    }
-
-    localStorage.setItem("users", JSON.stringify([...existingUsers, form]));
-    setMessage("✅ Registered successfully! Redirecting...");
+    setMessage("✅ Registered successfully! Redirecting to login...");
     setTimeout(() => navigate("/login"), 1500);
   };
 
@@ -109,30 +99,29 @@ const Register = () => {
           </div>
 
           {/* Inputs */}
-          {["name", "mobile", "email", "password", "confirmPassword"].map((field) => (
+          {["name", "mobile", "email", "password"].map((field) => (
             <input
               key={field}
               name={field}
               type={
-                field.includes("password")
+                field === "password"
                   ? "password"
                   : field === "email"
-                  ? "email"
-                  : field === "mobile"
-                  ? "tel"
-                  : "text"
+                    ? "email"
+                    : field === "mobile"
+                      ? "tel"
+                      : "text"
               }
               placeholder={
                 field === "name"
                   ? "Full Name"
                   : field === "mobile"
-                  ? "Mobile Number"
-                  : field === "email"
-                  ? "Email Address"
-                  : field === "password"
-                  ? "Password (min 8 chars & 1 symbol)"
-                  : "Confirm Password"
+                    ? "Mobile Number"
+                    : field === "email"
+                      ? "Email Address"
+                      : "Password (min 8 chars & 1 symbol)"
               }
+              value={form[field]}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#026aa7] focus:border-transparent"
               required
@@ -140,8 +129,16 @@ const Register = () => {
           ))}
 
           {/* Error / Success Messages */}
-          {error && <p className="text-red-500 text-sm sm:text-base text-center">{error}</p>}
-          {message && <p className="text-green-600 text-sm sm:text-base text-center">{message}</p>}
+          {error && (
+            <p className="text-red-500 text-sm sm:text-base text-center">
+              {error}
+            </p>
+          )}
+          {message && (
+            <p className="text-green-600 text-sm sm:text-base text-center">
+              {message}
+            </p>
+          )}
 
           {/* Submit Button */}
           <button
@@ -155,7 +152,10 @@ const Register = () => {
         {/* Login link */}
         <p className="text-sm sm:text-base text-center text-gray-600 mt-4">
           Already have an account?{" "}
-          <Link to="/login" className="text-[#026aa7] font-medium hover:underline">
+          <Link
+            to="/login"
+            className="text-[#026aa7] font-medium hover:underline"
+          >
             Log in
           </Link>
         </p>
@@ -163,7 +163,7 @@ const Register = () => {
         {/* Footer */}
         <div className="mt-6 border-t pt-3 text-center">
           <p className="text-xs sm:text-sm text-gray-400">
-            © {new Date().getFullYear()} Trello — Built with Abdullah
+            © {new Date().getFullYear()} Trello — Built by Abdullah
           </p>
         </div>
       </div>

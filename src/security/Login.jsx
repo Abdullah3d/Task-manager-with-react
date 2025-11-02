@@ -19,18 +19,36 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    // Get registered user 
-    const savedUser = JSON.parse(localStorage.getItem("user"));
+    // ✅ Get registered user safely
+    let savedUser = null;
+    try {
+      savedUser = JSON.parse(localStorage.getItem("user"));
+    } catch {
+      savedUser = null;
+    }
 
     if (
       savedUser &&
       savedUser.email === form.email &&
       savedUser.password === form.password
     ) {
-      // Save logged-in user 
-      localStorage.setItem("loggedInUser", JSON.stringify(savedUser));
-      if (onLogin) onLogin();
-      navigate("/");
+      // ✅ Safe login storage
+      try {
+        // only store small, essential data
+        const minimalUser = {
+          email: savedUser.email,
+          name: savedUser.name || "",
+          picture: savedUser.picture || "",
+        };
+
+        localStorage.setItem("loggedInUser", JSON.stringify(minimalUser));
+        if (onLogin) onLogin();
+        navigate("/");
+      } catch (error) {
+        console.warn("LocalStorage is full, clearing old data…", error);
+        localStorage.clear(); // clear storage safely
+        setError("Storage full. Please try again — cache cleared.");
+      }
     } else {
       setError("Invalid email or password");
     }

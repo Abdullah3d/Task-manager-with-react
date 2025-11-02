@@ -4,12 +4,14 @@ import Main from './components/Main';
 import Sidebar from './components/Sidebar';
 import Login from './security/Login';
 import Register from './security/Register';
+import EditCard from './components/EditCard';
+import CardDetails from './components/CardDetails'; // optional if you want modal/detail page
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [selectedBoard, setSelectedBoard] = useState(null); 
+  const [selectedBoard, setSelectedBoard] = useState(null);
 
   // Check logged-in user on app load
   useEffect(() => {
@@ -45,13 +47,29 @@ function App() {
               <>
                 <Header onLogout={() => setUser(null)} />
                 <div className="content flex">
-                  <Sidebar onSelectBoard={setSelectedBoard} /> 
-                  <Main board={selectedBoard} /> 
+                  <Sidebar onSelectBoard={setSelectedBoard} />
+                  <Main board={selectedBoard} />
                 </div>
               </>
             ) : (
               <Navigate to="/login" />
             )
+          }
+        />
+
+        {/* Card Details Page */}
+        <Route
+          path="/card/:id"
+          element={
+            user ? <CardDetails /> : <Navigate to="/login" />
+          }
+        />
+
+        {/* Edit Card Page */}
+        <Route
+          path="/edit-card/:id"
+          element={
+            user ? <EditCard /> : <Navigate to="/login" />
           }
         />
 

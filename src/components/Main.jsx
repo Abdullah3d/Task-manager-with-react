@@ -1,16 +1,30 @@
 import React, { useState } from "react";
-import { Edit2, MoreHorizontal, Trash2 } from "react-feather";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { Edit2, MoreHorizontal, Trash2 } from "react-feather";
 import AddCard from "./AddCard";
-import AddMultipleCardsModal from "./AddMultipleCard";
+import AddMultipleCard from "./AddMultipleCard";
+import { useNavigate } from "react-router-dom";
 
 export default function Main({ board }) {
+    const navigate = useNavigate();
     const initialBoard = board || { id: "default", name: "My Trello Board" };
 
     const [columns, setColumns] = useState([
-        { id: "1", title: "To Do", cards: [{ title: "Project Description" }] },
-        { id: "2", title: "In Progress", cards: [{ title: "Implement Feature A" }] },
-        { id: "3", title: "Done", cards: [{ title: "Setup Project Repo" }] },
+        {
+            id: "1",
+            title: "To Do",
+            cards: [{ id: "c1", title: "Project Description", description: "", checklist: [] }],
+        },
+        {
+            id: "2",
+            title: "In Progress",
+            cards: [{ id: "c2", title: "Implement Feature A", description: "", checklist: [] }],
+        },
+        {
+            id: "3",
+            title: "Done",
+            cards: [{ id: "c3", title: "Setup Project Repo", description: "", checklist: [] }],
+        },
     ]);
 
     const [openMenu, setOpenMenu] = useState(null);
@@ -20,23 +34,18 @@ export default function Main({ board }) {
     // Add Card
     const handleAddCard = (columnId, cardData) => {
         if (!cardData || !cardData.title) return;
+        const newCard = { id: Date.now().toString(), ...cardData, checklist: cardData.checklist || [] };
         setColumns((prev) =>
-            prev.map((col) =>
-                col.id === columnId
-                    ? { ...col, cards: [...col.cards, cardData] }
-                    : col
-            )
+            prev.map((col) => (col.id === columnId ? { ...col, cards: [...col.cards, newCard] } : col))
         );
     };
 
     // Delete Card
-    const handleDeleteCard = (columnId, cardIndex) => {
+    const handleDeleteCard = (columnId, cardId) => {
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         setColumns((prev) =>
             prev.map((col) =>
-                col.id === columnId
-                    ? { ...col, cards: col.cards.filter((_, idx) => idx !== cardIndex) }
-                    : col
+                col.id === columnId ? { ...col, cards: col.cards.filter((c) => c.id !== cardId) } : col
             )
         );
     };
@@ -54,7 +63,7 @@ export default function Main({ board }) {
         setColumns((prev) => prev.filter((col) => col.id !== columnId));
     };
 
-    // Fixed Drag & Drop Logic
+    // Drag & Drop
     const handleDragEnd = (result) => {
         const { source, destination } = result;
         if (!destination) return;
@@ -70,18 +79,21 @@ export default function Main({ board }) {
             if (!movedCard) return prev;
 
             toCol.cards.splice(destination.index, 0, movedCard);
-
-            return newColumns.map((col) => ({
-                ...col,
-                cards: col.cards.filter(Boolean),
-            }));
+            return newColumns.map((col) => ({ ...col, cards: col.cards.filter(Boolean) }));
         });
     };
 
-    const openAddMultipleCardsModal = (columnId) => {
+    const openAddMultipleCard = (columnId) => {
         setActiveColumnId(columnId);
         setModalOpen(true);
         setOpenMenu(null);
+    };
+
+    // Helper for checklist count
+    const getChecklistSummary = (card) => {
+        if (!card.checklist || card.checklist.length === 0) return "";
+        const completed = card.checklist.filter((item) => item.completed).length;
+        return `✔ ${completed}/${card.checklist.length}`;
     };
 
     return (
@@ -106,14 +118,10 @@ export default function Main({ board }) {
                                 >
                                     {/* Column Header */}
                                     <div className="flex justify-between items-center mb-2">
-                                        <span className="font-semibold text-sm sm:text-base tracking-wide truncate">
-                                            {col.title}
-                                        </span>
+                                        <span className="font-semibold text-sm sm:text-base tracking-wide truncate">{col.title}</span>
                                         <div className="relative">
                                             <button
-                                                onClick={() =>
-                                                    setOpenMenu(openMenu === col.id ? null : col.id)
-                                                }
+                                                onClick={() => setOpenMenu(openMenu === col.id ? null : col.id)}
                                                 className="hover:bg-[#3A3F45] p-1 rounded transition"
                                             >
                                                 <MoreHorizontal size={16} />
@@ -122,7 +130,7 @@ export default function Main({ board }) {
                                                 <div className="absolute right-0 top-6 bg-[#3A3F45] p-2 rounded shadow-lg z-10 flex flex-col gap-1 text-sm animate-fade-in">
                                                     <button
                                                         className="hover:bg-[#4A4F55] p-1 rounded text-left"
-                                                        onClick={() => openAddMultipleCardsModal(col.id)}
+                                                        onClick={() => openAddMultipleCard(col.id)}
                                                     >
                                                         Add Multiple Cards
                                                     </button>
@@ -139,35 +147,44 @@ export default function Main({ board }) {
 
                                     {/* Cards */}
                                     <div className="space-y-2 transition-all duration-200">
-                                        {col.cards.filter(Boolean).map((card, idx) => (
-                                            <Draggable
-                                                key={`${col.id}-${idx}`}
-                                                draggableId={`${col.id}-${idx}`}
-                                                index={idx}
-                                            >
+                                        {col.cards.map((card, idx) => (
+                                            <Draggable key={card.id} draggableId={card.id} index={idx}>
                                                 {(provided) => (
                                                     <div
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
                                                         className="bg-[#22272B] p-2 sm:p-3 rounded-md border border-transparent hover:border-[#3A3F45] cursor-pointer shadow-sm hover:shadow-md transition-all duration-150"
+                                                        onClick={() =>
+                                                            navigate(`/card/${card.id}`, { state: { cardId: card.id, columnId: col.id, columns, setColumns } })
+                                                        }
                                                     >
-                                                        <div className="flex justify-between items-center">
-                                                            <p className="font-medium text-xs sm:text-sm text-white truncate">
-                                                                {card.title || "Untitled Card"}
-                                                            </p>
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <p className="font-medium text-xs sm:text-sm text-white truncate">{card.title}</p>
                                                             <div className="flex gap-1">
-                                                                <button className="p-1 hover:bg-[#3A3F45] rounded">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        navigate(`/edit-card/${card.id}`, { state: { cardId: card.id, columnId: col.id, columns, setColumns } });
+                                                                    }}
+                                                                    className="p-1 hover:bg-[#3A3F45] rounded"
+                                                                >
                                                                     <Edit2 size={14} />
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => handleDeleteCard(col.id, idx)}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteCard(col.id, card.id);
+                                                                    }}
                                                                     className="p-1 hover:bg-[#3A3F45] rounded text-red-400"
                                                                 >
                                                                     <Trash2 size={14} />
                                                                 </button>
                                                             </div>
                                                         </div>
+                                                        {card.checklist && card.checklist.length > 0 && (
+                                                            <p className="text-xs text-gray-400">{getChecklistSummary(card)}</p>
+                                                        )}
                                                     </div>
                                                 )}
                                             </Draggable>
@@ -197,9 +214,9 @@ export default function Main({ board }) {
                 </div>
             </DragDropContext>
 
-            {/* ✅ Modal */}
+            {/* Add Multiple Cards Modal */}
             {modalOpen && activeColumnId && (
-                <AddMultipleCardsModal
+                <AddMultipleCard
                     open={modalOpen}
                     columnId={activeColumnId}
                     onClose={() => setModalOpen(false)}

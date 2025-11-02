@@ -39,7 +39,7 @@ export default function Header({ onLogout }) {
 
             {/* Right Section */}
             <div className="flex items-center space-x-3 sm:space-x-4">
-                {/* Optional Icons */}
+                {/* Icons */}
                 <button className="p-1 rounded hover:bg-[#2A2E32] transition">
                     <Bell size={18} className="text-[#B6C2CF]" />
                 </button>

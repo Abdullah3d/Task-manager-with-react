@@ -9,9 +9,9 @@ import { useEffect, useState } from 'react';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [selectedBoard, setSelectedBoard] = useState(null); // selected board
+  const [selectedBoard, setSelectedBoard] = useState(null); 
 
-  // Check localStorage when app mounts
+  // Check logged-in user on app load
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('loggedInUser'));
     if (storedUser) setUser(storedUser);
@@ -45,8 +45,8 @@ function App() {
               <>
                 <Header onLogout={() => setUser(null)} />
                 <div className="content flex">
-                  <Sidebar onSelectBoard={setSelectedBoard} /> {/* pass callback */}
-                  <Main board={selectedBoard} /> {/* pass selected board */}
+                  <Sidebar onSelectBoard={setSelectedBoard} /> 
+                  <Main board={selectedBoard} /> 
                 </div>
               </>
             ) : (
@@ -55,7 +55,7 @@ function App() {
           }
         />
 
-        {/* Catch all unknown routes */}
+        {/* Unknown routes */}
         <Route path="*" element={<Navigate to={user ? "/" : "/login"} />} />
       </Routes>
     </Router>

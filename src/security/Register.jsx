@@ -20,7 +20,7 @@ const Register = () => {
     setMessage("");
   };
 
-  // 🖼️ Upload + Convert image to Base64
+  // Upload + Convert image to Base64
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -33,7 +33,7 @@ const Register = () => {
     }
   };
 
-  // 🧠 Password validation
+  // Password validation
   const validatePassword = (password) => {
     const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
     if (password.length < 8) {
@@ -54,10 +54,10 @@ const Register = () => {
       return;
     }
 
-    // ✅ Save single user data (for header access)
+    // Save single user data (for header access)
     localStorage.setItem("user", JSON.stringify(form));
 
-    setMessage("✅ Registered successfully! Redirecting to login...");
+    setMessage("Registered successfully! Redirecting to login...");
     setTimeout(() => navigate("/login"), 1500);
   };
 

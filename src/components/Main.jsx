@@ -17,14 +17,19 @@ export default function Main({ board }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [activeColumnId, setActiveColumnId] = useState(null);
 
+    // Add Card
     const handleAddCard = (columnId, cardData) => {
+        if (!cardData || !cardData.title) return;
         setColumns((prev) =>
             prev.map((col) =>
-                col.id === columnId ? { ...col, cards: [...col.cards, cardData] } : col
+                col.id === columnId
+                    ? { ...col, cards: [...col.cards, cardData] }
+                    : col
             )
         );
     };
 
+    // Delete Card
     const handleDeleteCard = (columnId, cardIndex) => {
         if (!window.confirm("Are you sure you want to delete this card?")) return;
         setColumns((prev) =>
@@ -36,29 +41,40 @@ export default function Main({ board }) {
         );
     };
 
+    // Add Column
     const handleAddColumn = (title) => {
+        if (!title?.trim()) return;
         const newColumn = { id: Date.now().toString(), title, cards: [] };
         setColumns((prev) => [...prev, newColumn]);
     };
 
+    // Delete Column
     const handleDeleteColumn = (columnId) => {
         if (!window.confirm("Are you sure you want to delete this list?")) return;
         setColumns((prev) => prev.filter((col) => col.id !== columnId));
     };
 
+    // Fixed Drag & Drop Logic
     const handleDragEnd = (result) => {
         const { source, destination } = result;
         if (!destination) return;
-        if (source.droppableId === destination.droppableId && source.index === destination.index)
-            return;
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
         setColumns((prev) => {
             const newColumns = [...prev];
             const fromCol = newColumns.find((c) => c.id === source.droppableId);
             const toCol = newColumns.find((c) => c.id === destination.droppableId);
+            if (!fromCol || !toCol) return prev;
+
             const [movedCard] = fromCol.cards.splice(source.index, 1);
+            if (!movedCard) return prev;
+
             toCol.cards.splice(destination.index, 0, movedCard);
-            return newColumns;
+
+            return newColumns.map((col) => ({
+                ...col,
+                cards: col.cards.filter(Boolean),
+            }));
         });
     };
 
@@ -103,18 +119,18 @@ export default function Main({ board }) {
                                                 <MoreHorizontal size={16} />
                                             </button>
                                             {openMenu === col.id && (
-                                                <div className="absolute right-0 top-6 bg-[#3A3F45] p-2 rounded shadow-lg z-10 flex flex-col gap-1 text-sm">
+                                                <div className="absolute right-0 top-6 bg-[#3A3F45] p-2 rounded shadow-lg z-10 flex flex-col gap-1 text-sm animate-fade-in">
                                                     <button
                                                         className="hover:bg-[#4A4F55] p-1 rounded text-left"
                                                         onClick={() => openAddMultipleCardsModal(col.id)}
                                                     >
-                                                         Add Multiple Cards
+                                                        Add Multiple Cards
                                                     </button>
                                                     <button
                                                         className="hover:bg-[#4A4F55] p-1 rounded text-left text-red-400"
                                                         onClick={() => handleDeleteColumn(col.id)}
                                                     >
-                                                         Delete List
+                                                        Delete List
                                                     </button>
                                                 </div>
                                             )}
@@ -122,8 +138,8 @@ export default function Main({ board }) {
                                     </div>
 
                                     {/* Cards */}
-                                    <div className="space-y-2">
-                                        {col.cards.map((card, idx) => (
+                                    <div className="space-y-2 transition-all duration-200">
+                                        {col.cards.filter(Boolean).map((card, idx) => (
                                             <Draggable
                                                 key={`${col.id}-${idx}`}
                                                 draggableId={`${col.id}-${idx}`}
@@ -134,11 +150,11 @@ export default function Main({ board }) {
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
-                                                        className="bg-[#22272B] p-2 sm:p-3 rounded-md border border-transparent hover:border-[#3A3F45] cursor-pointer shadow-sm hover:shadow-md transition"
+                                                        className="bg-[#22272B] p-2 sm:p-3 rounded-md border border-transparent hover:border-[#3A3F45] cursor-pointer shadow-sm hover:shadow-md transition-all duration-150"
                                                     >
                                                         <div className="flex justify-between items-center">
                                                             <p className="font-medium text-xs sm:text-sm text-white truncate">
-                                                                {card.title}
+                                                                {card.title || "Untitled Card"}
                                                             </p>
                                                             <div className="flex gap-1">
                                                                 <button className="p-1 hover:bg-[#3A3F45] rounded">
@@ -181,7 +197,7 @@ export default function Main({ board }) {
                 </div>
             </DragDropContext>
 
-            {/* Modal */}
+            {/* ✅ Modal */}
             {modalOpen && activeColumnId && (
                 <AddMultipleCardsModal
                     open={modalOpen}

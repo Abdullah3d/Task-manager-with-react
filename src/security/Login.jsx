@@ -19,7 +19,7 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    // 🔍 Get registered user (from updated Register.jsx)
+    // Get registered user 
     const savedUser = JSON.parse(localStorage.getItem("user"));
 
     if (
@@ -27,7 +27,7 @@ const Login = ({ onLogin }) => {
       savedUser.email === form.email &&
       savedUser.password === form.password
     ) {
-      // ✅ Save logged-in user for Header
+      // Save logged-in user 
       localStorage.setItem("loggedInUser", JSON.stringify(savedUser));
       if (onLogin) onLogin();
       navigate("/");

@@ -6,8 +6,8 @@ export default function AddCard({ onAdd }) {
     const [show, setShow] = useState(false);
 
     const handleAddCard = () => {
-        if (card.trim() === "") return;
-        if (onAdd) onAdd(card);
+        if (!card.trim()) return;
+        if (onAdd) onAdd(card); // ✅ send string only
         setCard("");
         setShow(false);
     };
